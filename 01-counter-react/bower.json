@@ -2,7 +2,6 @@
   "name": "01-counter-react",
   "private": true,
   "dependencies": {
-    "jquery": "~1.11.1",
     "react": "~0.12.2"
   }
 }
