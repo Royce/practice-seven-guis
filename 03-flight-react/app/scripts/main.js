@@ -1,25 +1,31 @@
 'use strict';
 
+var FlightOptions = React.createClass({
+	render: function() {
+		return React.createElement('select', {value: 'Return'},
+			React.createElement('option', {value: 'OneWay'}, "One Way"),
+			React.createElement('option', {value: 'Return'}, "Return")
+		);
+	}
+});
+
+var DateInput = React.createClass({
+	render: function() {
+		return React.createElement('input', {
+			value: this.props.date
+		});
+	}
+});
+
 var FlightBooker = React.createClass({
-	getInitialState: function() {
-		return {depart: '27.03.2014', return: '27.04.2014'};
-	},
 	render: function() {
 		return (
 			React.createElement('div', null,
-				React.createElement('select', {value: 'Return'},
-					React.createElement('option', {value: 'OneWay'}, "One Way"),
-					React.createElement('option', {value: 'Return'}, "Return")),
+				React.createElement(FlightOptions, null),
 				React.createElement('br'),
-				React.createElement('input', {
-					value: this.state.depart,
-					ref: "depart"
-				}),
+				React.createElement(DateInput, {date: '27.03.2014'}),
 				React.createElement('br'),
-				React.createElement('input', {
-					value: this.state.return,
-					ref: "return"
-				}),
+				React.createElement(DateInput, {date: '27.03.2014'}),
 				React.createElement('br'),
 				React.createElement('button', null, "Book")
 			)
