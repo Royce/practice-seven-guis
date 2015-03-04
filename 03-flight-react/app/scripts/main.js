@@ -11,8 +11,14 @@ var FlightOptions = React.createClass({
 
 var DateInput = React.createClass({
 	render: function() {
+		var invalid = this.props.disabled !== true && (
+			this.props.valid === false
+			|| false // internal checks?
+		);
 		return React.createElement('input', {
-			value: this.props.date
+			value: this.props.date,
+			disabled: this.props.disabled,
+			style: invalid ? {color: 'red'} : null
 		});
 	}
 });
@@ -23,9 +29,9 @@ var FlightBooker = React.createClass({
 			React.createElement('div', null,
 				React.createElement(FlightOptions, null),
 				React.createElement('br'),
-				React.createElement(DateInput, {date: '27.03.2014'}),
+				React.createElement(DateInput, {date: '27.03.2014', valid: false}),
 				React.createElement('br'),
-				React.createElement(DateInput, {date: '27.03.2014'}),
+				React.createElement(DateInput, {date: '27.03.2014', disabled: true}),
 				React.createElement('br'),
 				React.createElement('button', null, "Book")
 			)
