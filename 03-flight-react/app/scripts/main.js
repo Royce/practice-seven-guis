@@ -89,7 +89,14 @@ var FlightBooker = React.createClass({
 					disabled: this.state.flightOption !== 'Return'
 				}),
 				React.createElement('br'),
-				React.createElement('button', null, "Book")
+				React.createElement('button', {
+					disabled: this.state.flightOption === 'Return' &&
+						this.state.return.isBefore(this.state.depart)
+				}, "Book"),
+				React.createElement('span', null, this.state.flightOption === 'Return'
+					? ("a journey departing " + this.state.depart.calendar() +
+						", returning " + this.state.return.calendar())
+					: ("a one-way flight departing " + this.state.depart.calendar()))
 			)
 		);
 	}
