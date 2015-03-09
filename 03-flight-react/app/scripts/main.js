@@ -53,8 +53,9 @@ var FlightBooker = React.createClass({
 	getInitialState: function() {
 		return {
 			flightOption: 'Return',
-			depart: moment(),
-			'return': moment()};
+			depart: moment().startOf('day'),
+			'return': moment().startOf('day')};
+	},
 	onNewFlightOption: function(o) {
 		var state = this.state;
 		state.flightOption = o;
