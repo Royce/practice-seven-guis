@@ -1,8 +1,15 @@
 'use strict';
 
 var FlightOptions = React.createClass({
+	handleChange: function(e) {
+		this.props.onUpdate(this.refs.option.getDOMNode().value)
+	},
 	render: function() {
-		return React.createElement('select', {value: 'Return'},
+		return React.createElement('select', {
+				value: this.props.option,
+				ref: 'option',
+				onChange: this.handleChange
+			},
 			React.createElement('option', {value: 'OneWay'}, "One Way"),
 			React.createElement('option', {value: 'Return'}, "Return")
 		);
@@ -49,6 +56,10 @@ var FlightBooker = React.createClass({
 			flightOption: 'Return',
 			depart: moment(),
 			'return': moment()};
+	onNewFlightOption: function(o) {
+		var state = this.state;
+		state.flightOption = o;
+		this.setState(state);
 	},
 	onNewDepartDate: function(m) {
 		var state = this.state;
@@ -63,7 +74,10 @@ var FlightBooker = React.createClass({
 	render: function() {
 		return (
 			React.createElement('div', null,
-				React.createElement(FlightOptions, null),
+				React.createElement(FlightOptions, {
+					option: this.state.flightOption,
+					onUpdate: this.onNewFlightOption
+				}),
 				React.createElement('br'),
 				React.createElement(DateInput, {
 					date: this.state.depart,
@@ -72,7 +86,8 @@ var FlightBooker = React.createClass({
 				React.createElement(DateInput, {
 					date: this.state.return,
 					onUpdate: this.onNewReturnDate,
-					disabled: true}),
+					disabled: this.state.flightOption !== 'Return'
+				}),
 				React.createElement('br'),
 				React.createElement('button', null, "Book")
 			)
