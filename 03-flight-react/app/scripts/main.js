@@ -11,39 +11,29 @@ var FlightOptions = React.createClass({
 
 var DateInput = React.createClass({
 	getInitialState: function() {
-		return {
-			value: this.props.date.format("DD.MM.YYYY"),
-			lastValidValue: this.props.date.format("DD.MM.YYYY"),
-			valid: true
-		};
+		return { invalidValue: null };
 	},
 	handleChange: function() {
-		var state = {};
-		state.value = this.refs.date.getDOMNode().value;
+		var raw = this.refs.date.getDOMNode().value;
 
-		var m = moment(state.value, "DD.MM.YYYY", true);
-		state.valid = m.isValid();
+		var m = moment(raw, "DD.MM.YYYY", true);
 
 		if (m.isValid()) {
-			state.lastValidValue = state.value;
 			this.props.onUpdate(m);
 		}
 
-		this.setState(state);
+		this.setState({invalidValue: m.isValid() ? null: raw});
 	},
 	finishEdit: function() {
-		var state = this.state;
-		state.value = state.lastValidValue;
-		state.valid = true;
-		this.setState(state);
+		this.setState({invalidValue:null});
 	},
 	render: function() {
 		var invalid = this.props.disabled !== true && (
 			this.props.valid === false ||
-			this.state.valid === false // internal checks
+			this.state.invalidValue !== null
 		);
 		return React.createElement('input', {
-			value: this.state.value,
+			value: this.state.invalidValue || this.props.date.format("DD.MM.YYYY"),
 			ref: "date",
 			onChange: this.handleChange,
 			onBlur: this.finishEdit,
