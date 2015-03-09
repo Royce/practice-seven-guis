@@ -35,10 +35,9 @@ var DateInput = React.createClass({
 		this.setState({invalidValue:null});
 	},
 	render: function() {
-		var invalid = this.props.disabled !== true && (
-			this.props.valid === false ||
+		var invalid = this.props.disabled !== true &&
 			this.state.invalidValue !== null
-		);
+		;
 		return React.createElement('input', {
 			value: this.state.invalidValue || this.props.date.format("DD.MM.YYYY"),
 			ref: "date",
