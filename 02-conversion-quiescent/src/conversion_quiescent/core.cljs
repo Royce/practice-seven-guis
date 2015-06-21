@@ -3,6 +3,7 @@
   (:require [cljs.core.async :refer [chan <! >!]]
             [quiescent.core :as q]
             [quiescent.dom :as d]
+            [quiescent.dom.uncontrolled :as du]
             [cljs.reader :refer [read-string]]))
 
 (enable-console-print!)
@@ -15,7 +16,7 @@
 ;; View
 (q/defcomponent Numeric [state channel key label]
   (d/div {}
-         (d/input {:type "text"
+         (du/input {:type "text"
                    :value (or (key state) "")
                    :onChange
                    (fn [event]
@@ -33,11 +34,12 @@
 
 
 ;; Render it!
-(defn render [state]
-  (q/render (Everything state)
-            (.getElementById js/document "app")))
+(defn render []
+  (q/render (Everything @app-state)
+            (.getElementById js/document "app"))
+  )
 
-(render @app-state)
+(render)
 
 
 ;; Event Handling / Channels
@@ -57,7 +59,8 @@
     (if parsed
       (reset! app-state ((get conversions key) parsed))
       (swap! app-state assoc key value)))
-  (render @app-state))
+;;   (render))
+  (.requestAnimationFrame js/window render))
 
 (go (while true
   (handle-events (<! channel))))
