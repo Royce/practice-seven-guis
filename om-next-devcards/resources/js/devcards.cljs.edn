@@ -1,0 +1,5 @@
+{:require [dev.core]
+ :init-fns [dev.core/main]
+ :compiler-options {:asset-path "js/devcards.out"
+                    :devcards true}
+ }
