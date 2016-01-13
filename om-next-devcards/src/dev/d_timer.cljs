@@ -93,7 +93,27 @@
    {:state state
     :parser (om/parser {:read read :mutate mutate})}))
 
-(js/setInterval #(om/transact! reconciler `[(timer/update)]) 100)
+
+(def interval (atom nil))
+(defcard toggle-interval-tick
+  (fn [data _owner]
+    (html
+     [:div
+      (if (nil? @interval)
+        [:button
+         {:on-click
+          (fn [_] (reset! interval
+                          (js/setInterval
+                           #(om/transact! reconciler `[(timer/update)])
+                           100)))}
+         "Enable"]
+        [:button
+         {:on-click
+          (fn [_]
+            (js/clearInterval @interval)
+            (reset! interval nil))}
+         "Disable"])]))
+  interval)
 
 (defcard ui
   (dc/dom-node
