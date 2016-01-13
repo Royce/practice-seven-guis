@@ -4,6 +4,7 @@
    [dev.b-conversion]
    [dev.c-flight-booker]
    [dev.d-timer]
+   [dev.e-crud]
    [devcards.core :as dc :refer-macros [defcard]]
    ))
 
