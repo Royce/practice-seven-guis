@@ -1,0 +1,9 @@
+.progress-bar {
+  -moz-transition: none;
+  -webkit-transition: none;
+  -o-transition: color 0 ease-in;
+  transition: none;
+}
+.control-label {
+  padding-top: 7px;
+}
