@@ -1,8 +1,0 @@
-{
-  "name": "03-flight-react",
-  "private": true,
-  "dependencies": {
-    "react": "~0.12.2",
-    "moment": "~2.9.0"
-  }
-}

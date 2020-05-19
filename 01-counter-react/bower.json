@@ -1,7 +1,0 @@
-{
-  "name": "01-counter-react",
-  "private": true,
-  "dependencies": {
-    "react": "~0.12.2"
-  }
-}

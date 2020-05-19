@@ -1,7 +1,0 @@
-{
-  "name": "02-temperature-react",
-  "private": true,
-  "dependencies": {
-    "react": "~0.12.2"
-  }
-}
