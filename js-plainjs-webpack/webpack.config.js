@@ -1,6 +1,9 @@
+const _ = require("lodash");
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+
+const pages = ["counter"];
 
 module.exports = {
 	mode: "development",
@@ -11,10 +14,22 @@ module.exports = {
 		hot: true,
 	},
 	plugins: [
+		...pages.map(
+			(p, i) =>
+				new HtmlWebpackPlugin({
+					filename: `${p}.html`,
+					title: p.toUpperCase(),
+					template: `src/${p}.html`,
+					pages,
+				})
+		),
+				new HtmlWebpackPlugin({
+					// index
+					title: 'Seven GUIs',
+					template: `src/${pages[0]}.html`,
+					pages,
+				}),
 		new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
-		new HtmlWebpackPlugin({
-			title: "Seven GUIs",
-		}),
 	],
 	output: {
 		filename: "main.js",

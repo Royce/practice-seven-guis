@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title><%= htmlWebpackPlugin.options.title %></title>
+  </head>
+  <body>
+  	<ul>
+  	<% _.forEach(htmlWebpackPlugin.options.pages, function(p) { %><a href="<%- p %>.html"><%- p %></a></li><% }) %></ul>
+  	<hr />
+  	<h1><%= htmlWebpackPlugin.options.title %></h1>
+  	<div id="counter">
+	  	<span id="value">?</span> <button id="button">Increment</button>
+  	</div>
+  </body>
+</html>
