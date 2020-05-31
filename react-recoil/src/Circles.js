@@ -10,27 +10,33 @@ import {
 } from 'recoil';
 
 import memoize from 'lodash.memoize';
-import some from 'lodash.some';
 
-const hit = function (coord, { x, y, r }) {
-  return Math.pow(coord.x - x, 2) + Math.pow(coord.y - y, 2) <= Math.pow(r, 2);
-};
+const selectedCircleState = atom({ key: 'selected', default: [] });
 
-const selectedCircleState = atom({ key: 'selected', default: null });
-
-const circleWithId = memoize((id) =>
-  atom({
+const circleWithId = memoize((id) => {
+  return atom({
     key: `Circle${id}`,
     default: { id, x: 0, y: 0, r: 10 },
-  })
-);
+  });
+});
+
+const circleIsSelected = memoize((id) => {
+  return selector({
+    key: `circleIsSelected${id}`,
+    get: ({ get }) => {
+      const selectedId = get(selectedCircleState);
+      return id === selectedId;
+    },
+  });
+});
 
 function Circle({ id }) {
   const { x, y, r } = useRecoilValue(circleWithId(id));
-  const [selected, setSelected] = useRecoilState(selectedCircleState);
-  const isSelected = selected === id;
+  const setSelected = useSetRecoilState(selectedCircleState);
+  const isSelected = useRecoilValue(circleIsSelected(id));
 
   const strokeWidth = 1;
+
   return (
     <circle
       cx={x}
@@ -41,7 +47,8 @@ function Circle({ id }) {
           ? { fill: 'skyblue', stroke: 'cadetblue', strokeWidth }
           : { fill: 'white', stroke: 'grey', strokeWidth }
       }
-      onClick={() => {
+      onClick={(e) => {
+        e.stopPropagation();
         setSelected(id);
       }}
     />
@@ -58,14 +65,6 @@ const circleListState = atom({
   default: [],
 });
 
-const circleListStateWithDetails = selector({
-  key: 'circleListStateWithDetails',
-  get: ({ get }) => {
-    const list = get(circleListState);
-    return list.map((id) => get(circleWithId(id)));
-  },
-});
-
 function Circles() {
   const circleList = useRecoilValue(circleListState);
 
@@ -74,7 +73,6 @@ function Circles() {
 
 function Canvas() {
   const setCircleList = useSetRecoilState(circleListState);
-  const circleList = useRecoilValue(circleListStateWithDetails);
 
   const nextIdRef = useRef(null);
   if (nextIdRef.current === null) nextIdRef.current = getId();
@@ -107,12 +105,9 @@ function Canvas() {
   const onClick = useCallback(
     (e) => {
       const coord = getCoord(e);
-
-      if (!some(circleList, (circle) => hit(coord, circle))) {
-        addCircle(coord);
-      }
+      addCircle(coord);
     },
-    [circleList, getCoord, addCircle]
+    [getCoord, addCircle]
   );
 
   return (
@@ -131,6 +126,23 @@ function Canvas() {
 }
 
 function UndoButtons() {
+  // const [history, setHistory] = useState([]);
+
+  // useTransactionObservation_UNSTABLE((x) => {
+  //   console.log(x);
+  //   let { atomValues, atomInfo, modifiedAtoms } = x;
+  //   for (const atomName of modifiedAtoms) {
+  //     console.log('modA:', atomName);
+
+  //     if (atomName === 'circleListState') {
+  //       console.log(atomValues, atomInfo);
+  //       // setHistory((h) => [...h, modifiedAtom.value]);
+  //     }
+  //   }
+  // });
+
+  // console.log(history);
+
   return (
     <div>
       <button>Undo</button>
