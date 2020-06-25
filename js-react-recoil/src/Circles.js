@@ -7,6 +7,7 @@ import {
   useRecoilState,
   useSetRecoilState,
   useRecoilValue,
+  useRecoilCallback,
 } from 'recoil';
 
 import memoize from 'lodash.memoize';
@@ -72,23 +73,20 @@ function Circles() {
 }
 
 function Canvas() {
-  const setCircleList = useSetRecoilState(circleListState);
-
   const nextIdRef = useRef(null);
   if (nextIdRef.current === null) nextIdRef.current = getId();
-  const [nextCircle, setNextCircle] = useRecoilState(
-    circleWithId(nextIdRef.current)
-  );
 
-  const addCircle = useCallback(
-    ({ x, y }) => {
-      setNextCircle((circle) => {
+  const addCircle = useRecoilCallback(
+    ({ set }) => async ({ x, y }) => {
+      const id = nextIdRef.current;
+      nextIdRef.current = getId();
+
+      set(circleWithId(id), (circle) => {
         return { ...circle, x, y };
       });
-      setCircleList((prev) => [...prev, nextCircle.id]);
-      nextIdRef.current = getId();
+      set(circleListState, (list) => [...list, id]);
     },
-    [setCircleList, setNextCircle, nextCircle]
+    [nextIdRef]
   );
 
   const svgRef = useRef(null);
