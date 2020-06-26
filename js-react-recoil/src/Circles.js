@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useState } from 'react';
 
 import {
   RecoilRoot,
@@ -8,6 +8,8 @@ import {
   useSetRecoilState,
   useRecoilValue,
   useRecoilCallback,
+  useRecoilTransactionObserver_UNSTABLE,
+  useGotoRecoilSnapshot,
 } from 'recoil';
 
 import memoize from 'lodash.memoize';
@@ -124,26 +126,45 @@ function Canvas() {
 }
 
 function UndoButtons() {
-  // const [history, setHistory] = useState([]);
+  const [snapshots, setSnapshots] = useState([]);
+  const [offset, setOffset] = useState(0);
+  const isUndoingRef = useRef(false);
 
-  // useTransactionObservation_UNSTABLE((x) => {
-  //   console.log(x);
-  //   let { atomValues, atomInfo, modifiedAtoms } = x;
-  //   for (const atomName of modifiedAtoms) {
-  //     console.log('modA:', atomName);
+  console.log(snapshots, offset);
 
-  //     if (atomName === 'circleListState') {
-  //       console.log(atomValues, atomInfo);
-  //       // setHistory((h) => [...h, modifiedAtom.value]);
-  //     }
-  //   }
-  // });
+  useRecoilTransactionObserver_UNSTABLE(({ snapshot, previousSnapshot }) => {
+    if (isUndoingRef.current === true) {
+      console.log('skip');
+      isUndoingRef.current = false;
+      return;
+    }
 
-  // console.log(history);
+    // Most recent/future at the front.
+    if (snapshots.length === 0) {
+      setSnapshots([snapshot, previousSnapshot]);
+    } else if (offset > 0) {
+      console.log('*', offset, snapshot, snapshots.slice(offset));
+      setSnapshots([snapshot, ...snapshots.slice(offset)]);
+      setOffset(0);
+    } else {
+      setSnapshots([snapshot, ...snapshots]);
+    }
+  });
+
+  const gotoSnapshot = useGotoRecoilSnapshot();
+
+  const undo = useCallback(() => {
+    isUndoingRef.current = true;
+    const newOffset = offset + 1;
+    setOffset(newOffset);
+    gotoSnapshot(snapshots[newOffset]);
+  }, [isUndoingRef, gotoSnapshot, snapshots, offset, setOffset]);
 
   return (
     <div>
-      <button>Undo</button>
+      <button disabled={snapshots.length <= offset + 1} onClick={undo}>
+        Undo
+      </button>
       <button>Redo</button>
     </div>
   );
