@@ -137,7 +137,6 @@ function UndoButtons() {
 
   useRecoilTransactionObserver_UNSTABLE(({ snapshot, previousSnapshot }) => {
     if (isUndoingRef.current) {
-      console.log('skip');
       isUndoingRef.current = false;
       return;
     }
@@ -158,7 +157,16 @@ function UndoButtons() {
       if (!past.length) return { past, current, future };
 
       isUndoingRef.current = true;
-      console.log('undoing');
+      setTimeout(() => {
+        // Known bug.
+        // If you undo all the way to the initial state and call
+        // gotoSnapshot(s), then the useRecoilTransationObserver()
+        // does not fire and isUdoingRef is not reset.
+        //
+        // So we force it back to false after a small delay. Ugh.
+        isUndoingRef.current = false;
+      }, 30);
+
       const target = past[past.length - 1];
 
       gotoSnapshot(target);
