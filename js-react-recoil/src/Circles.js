@@ -126,43 +126,53 @@ function Canvas() {
 }
 
 function UndoButtons() {
-  const [snapshots, setSnapshots] = useState([]);
-  const [offset, setOffset] = useState(0);
+  const [history, setHistory] = useState({
+    past: [],
+    current: null,
+    future: [],
+  });
   const isUndoingRef = useRef(false);
 
-  console.log(snapshots, offset);
+  console.log(history);
 
   useRecoilTransactionObserver_UNSTABLE(({ snapshot, previousSnapshot }) => {
-    if (isUndoingRef.current === true) {
+    if (isUndoingRef.current) {
       console.log('skip');
       isUndoingRef.current = false;
       return;
     }
 
-    // Most recent/future at the front.
-    if (snapshots.length === 0) {
-      setSnapshots([snapshot, previousSnapshot]);
-    } else if (offset > 0) {
-      console.log('*', offset, snapshot, snapshots.slice(offset));
-      setSnapshots([snapshot, ...snapshots.slice(offset)]);
-      setOffset(0);
-    } else {
-      setSnapshots([snapshot, ...snapshots]);
-    }
+    setHistory(({ past, current }) => {
+      return {
+        past: [...past, current || previousSnapshot],
+        current: snapshot,
+        future: [],
+      };
+    });
   });
 
   const gotoSnapshot = useGotoRecoilSnapshot();
 
   const undo = useCallback(() => {
-    isUndoingRef.current = true;
-    const newOffset = offset + 1;
-    setOffset(newOffset);
-    gotoSnapshot(snapshots[newOffset]);
-  }, [isUndoingRef, gotoSnapshot, snapshots, offset, setOffset]);
+    setHistory(({ past, current, future }) => {
+      if (!past.length) return { past, current, future };
+
+      isUndoingRef.current = true;
+      console.log('undoing');
+      const target = past[past.length - 1];
+
+      gotoSnapshot(target);
+      return {
+        past: past.slice(0, past.length - 1),
+        current: target,
+        future: [current, ...future],
+      };
+    });
+  }, [isUndoingRef, gotoSnapshot, setHistory]);
 
   return (
     <div>
-      <button disabled={snapshots.length <= offset + 1} onClick={undo}>
+      <button disabled={history.past.length === 0} onClick={undo}>
         Undo
       </button>
       <button>Redo</button>
