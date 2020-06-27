@@ -14,7 +14,7 @@ import {
 
 import memoize from 'lodash.memoize';
 
-const selectedCircleState = atom({ key: 'selected', default: [] });
+const selectedCircleState = atom({ key: 'selected', default: null });
 
 const circleWithId = memoize((id) => {
   return atom({
