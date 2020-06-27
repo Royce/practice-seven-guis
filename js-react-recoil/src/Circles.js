@@ -178,12 +178,40 @@ function UndoButtons() {
     });
   }, [isUndoingRef, gotoSnapshot, setHistory]);
 
+  const redo = useCallback(() => {
+    setHistory(({ past, current, future }) => {
+      if (!future.length) return { past, current, future };
+
+      isUndoingRef.current = true;
+      // setTimeout(() => {
+      //   // Known bug.
+      //   // If you undo all the way to the initial state and call
+      //   // gotoSnapshot(s), then the useRecoilTransationObserver()
+      //   // does not fire and isUdoingRef is not reset.
+      //   //
+      //   // So we force it back to false after a small delay. Ugh.
+      //   isUndoingRef.current = false;
+      // }, 30);
+
+      const target = future[0];
+
+      gotoSnapshot(target);
+      return {
+        past: [...past, current],
+        current: target,
+        future: future.slice(1),
+      };
+    });
+  }, [isUndoingRef, gotoSnapshot, setHistory]);
+
   return (
     <div>
       <button disabled={history.past.length === 0} onClick={undo}>
         Undo
       </button>
-      <button>Redo</button>
+      <button disabled={history.future.length === 0} onClick={redo}>
+        Redo
+      </button>
     </div>
   );
 }
